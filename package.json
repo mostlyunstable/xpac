@@ -1,0 +1,50 @@
+{
+  "name": "xpac-dashboard",
+  "version": "1.0.0",
+  "description": "AI-powered IVR Campaign Management Dashboard — upload contacts, configure AI voices, schedule campaigns, and track orders.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "keywords": [
+    "ivr",
+    "campaign-management",
+    "ai",
+    "voice",
+    "dashboard",
+    "react",
+    "vite",
+    "nvidia",
+    "nim"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "server": "node server/index.js",
+    "start": "node server/index.js & vite",
+    "build": "vite build",
+    "lint": "oxlint",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "axios": "^1.18.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "multer": "^2.2.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-router-dom": "^7.18.1",
+    "uuid": "^14.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.2",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "oxlint": "^1.71.0",
+    "tailwindcss": "^4.3.2",
+    "vite": "^8.1.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
