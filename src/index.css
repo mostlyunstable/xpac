@@ -114,7 +114,94 @@
 }
 
 body {
-  min-height: max(884px, 100dvh);
+  min-height: 100dvh;
+}
+
+@keyframes staggerIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-stagger {
+  animation: staggerIn 0.4s ease-out both;
+}
+
+.animate-stagger-1 { animation-delay: 0ms; }
+.animate-stagger-2 { animation-delay: 60ms; }
+.animate-stagger-3 { animation-delay: 120ms; }
+.animate-stagger-4 { animation-delay: 180ms; }
+.animate-stagger-5 { animation-delay: 240ms; }
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-pop-in {
+  animation: popIn 0.2s ease-out both;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-down {
+  animation: slideDown 0.2s ease-out both;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: 0.02em;
+}
+
+.status-completed {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+.dark .status-completed {
+  background-color: #052e16;
+  color: #4ade80;
+}
+
+.status-running {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+.dark .status-running {
+  background-color: #172554;
+  color: #60a5fa;
+}
+
+.status-processing {
+  background-color: #fef9c3;
+  color: #a16207;
+}
+.dark .status-processing {
+  background-color: #422006;
+  color: #fbbf24;
+}
+
+.status-failed {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+.dark .status-failed {
+  background-color: #450a0a;
+  color: #f87171;
+}
+
+.status-queued {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+.dark .status-queued {
+  background-color: #1f2937;
+  color: #9ca3af;
 }
 
 .material-symbols-outlined {

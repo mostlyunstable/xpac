@@ -45,7 +45,7 @@ export default function AppLayout() {
             )}
           </button>
           {showNotifDropdown && (
-            <div className="absolute top-full right-0 mt-2 w-80 max-w-[calc(100vw-32px)] bg-surface-container-lowest rounded-xl border border-outline-variant shadow-xl z-[100] overflow-hidden">
+            <div className="absolute top-full right-0 mt-2 w-80 max-w-[calc(100vw-32px)] bg-surface-container-lowest rounded-xl border border-outline-variant shadow-xl z-[100] overflow-hidden animate-pop-in">
               <div className="px-4 py-3 border-b border-outline-variant flex items-center justify-between">
                 <span className="font-title-lg text-title-lg text-on-surface">Notifications</span>
                 {notifications.length > 0 && (
@@ -101,7 +101,7 @@ export default function AppLayout() {
             </div>
             <div>
               <p className="font-title-lg text-title-lg text-primary leading-tight">Admin</p>
-              <p className="font-label-md text-label-md text-outline">v2.4.0</p>
+              <p className="font-label-md text-label-md text-outline">v1.0.0</p>
             </div>
           </div>
         </div>
@@ -129,7 +129,7 @@ export default function AppLayout() {
       </aside>
 
       <main className="pt-24 pb-20 md:pb-8 md:pl-72 px-margin-mobile md:px-gutter min-h-screen">
-        <div className="max-w-[1440px] mx-auto py-lg">
+        <div className="max-w-[1440px] mx-auto py-lg animate-fade-in" key={location.pathname}>
           <Outlet />
         </div>
       </main>

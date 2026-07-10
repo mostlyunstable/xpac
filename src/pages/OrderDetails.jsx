@@ -87,12 +87,12 @@ export default function OrderDetails() {
           <div className="space-y-md">
             <div className="flex justify-between">
               <span className="font-label-md text-label-md text-on-surface-variant">Status</span>
-              <span className={`px-3 py-1 rounded-full font-label-md text-label-md ${
-                order.status === 'Completed' ? 'bg-green-100 text-green-700' :
-                order.status === 'Running' ? 'bg-blue-100 text-blue-700' :
-                order.status === 'Processing' ? 'bg-yellow-100 text-yellow-700' :
-                order.status === 'Failed' ? 'bg-red-100 text-red-700' :
-                'bg-surface-container-highest text-on-surface-variant'
+              <span className={`status-badge ${
+                order.status === 'Completed' ? 'status-completed' :
+                order.status === 'Running' ? 'status-running' :
+                order.status === 'Processing' ? 'status-processing' :
+                order.status === 'Failed' ? 'status-failed' :
+                'status-queued'
               }`}>
                 {order.status}
               </span>
@@ -134,7 +134,7 @@ export default function OrderDetails() {
               { status: 'Completed', time: order.status === 'Completed' ? order.updatedAt : null, done: order.status === 'Completed' },
             ].filter(s => s.done || s.time);
             return steps.map((step, i) => (
-              <div key={step.status} className="flex items-start gap-4">
+              <div key={step.status} className="flex items-start gap-4 animate-stagger" style={{ animationDelay: `${i * 80}ms` }}>
                 <div className="flex flex-col items-center">
                   <div className={`w-3 h-3 rounded-full ${step.done ? 'bg-primary' : 'bg-outline-variant'}`} />
                   {i < steps.length - 1 && <div className="w-0.5 h-8 bg-outline-variant" />}

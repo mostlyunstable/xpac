@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getCampaigns, getOrders } from '../services/api';
+import { SkeletonCard } from '../components/Skeleton';
 
 const REPORT_COLORS = {
   primary: 'text-primary',
@@ -42,22 +43,40 @@ export default function Reports() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[40vh]">
-        <div className="w-12 h-12 border-4 border-outline-variant border-t-primary rounded-full animate-spin" />
+      <div className="space-y-xl">
+        <div>
+          <div className="h-8 w-48 bg-surface-container-highest rounded-lg animate-pulse" />
+          <div className="h-4 w-64 bg-surface-container-highest rounded-lg animate-pulse mt-2" />
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-lg">
+          {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
+        </div>
+        <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg">
+          <div className="h-6 w-56 bg-surface-container-highest rounded-lg animate-pulse mb-lg" />
+          <div className="space-y-md">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-4">
+                <div className="w-24 h-4 bg-surface-container-highest rounded animate-pulse" />
+                <div className="flex-1 h-6 bg-surface-container-highest rounded-full animate-pulse" />
+                <div className="w-16 h-4 bg-surface-container-highest rounded animate-pulse" />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-xl">
-      <div>
+      <div className="animate-fade-in">
         <h1 className="font-headline-lg text-headline-lg text-on-surface">Reports</h1>
         <p className="font-body-md text-body-md text-on-surface-variant mt-1">Overview of your campaign performance.</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-lg">
-        {stats.map((stat) => (
-          <div key={stat.label} className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg">
+        {stats.map((stat, index) => (
+          <div key={stat.label} className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg animate-stagger" style={{ animationDelay: `${index * 50}ms` }}>
             <div className="flex items-center gap-3 mb-md">
               <span className={`material-symbols-outlined ${REPORT_COLORS[stat.color] || 'text-primary'}`}>{stat.icon}</span>
               <span className="font-label-md text-label-md text-on-surface-variant">{stat.label}</span>
@@ -71,16 +90,21 @@ export default function Reports() {
         <h2 className="font-title-lg text-title-lg text-on-surface mb-lg">Order Status Distribution</h2>
         <div className="space-y-md">
           {[
-            { label: 'Completed', count: completed, total: orders.length, color: 'bg-green-500' },
-            { label: 'Running', count: running, total: orders.length, color: 'bg-blue-500' },
-            { label: 'Failed', count: failed, total: orders.length, color: 'bg-red-500' },
-            { label: 'Other', count: orders.length - completed - running - failed, total: orders.length, color: 'bg-surface-container-highest' },
-          ].map((item) => (
-            <div key={item.label} className="flex items-center gap-4">
+            { label: 'Completed', count: completed, total: orders.length },
+            { label: 'Running', count: running, total: orders.length },
+            { label: 'Failed', count: failed, total: orders.length },
+            { label: 'Other', count: orders.length - completed - running - failed, total: orders.length },
+          ].map((item, index) => (
+            <div key={item.label} className="flex items-center gap-4 animate-stagger" style={{ animationDelay: `${index * 60}ms` }}>
               <span className="w-24 font-label-md text-label-md text-on-surface-variant">{item.label}</span>
               <div className="flex-1 h-6 bg-surface-container-highest rounded-full overflow-hidden">
                 <div
-                  className={`h-full ${item.color} rounded-full transition-all duration-500`}
+                  className={`h-full rounded-full transition-all duration-500 ${
+                    item.label === 'Completed' ? 'bg-green-500 dark:bg-green-400' :
+                    item.label === 'Running' ? 'bg-blue-500 dark:bg-blue-400' :
+                    item.label === 'Failed' ? 'bg-red-500 dark:bg-red-400' :
+                    'bg-surface-dim'
+                  }`}
                   style={{ width: item.total > 0 ? `${(item.count / item.total) * 100}%` : '0%' }}
                 />
               </div>
@@ -113,11 +137,11 @@ export default function Reports() {
                     <p className="font-label-md text-label-md text-outline">{order.campaignName || 'Untitled'}</p>
                   </div>
                 </div>
-                <span className={`px-3 py-1 rounded-full font-label-md text-label-md ${
-                  order.status === 'Completed' ? 'bg-green-100 text-green-700' :
-                  order.status === 'Running' ? 'bg-blue-100 text-blue-700' :
-                  order.status === 'Failed' ? 'bg-red-100 text-red-700' :
-                  'bg-surface-container-highest text-on-surface-variant'
+                <span className={`status-badge ${
+                  order.status === 'Completed' ? 'status-completed' :
+                  order.status === 'Running' ? 'status-running' :
+                  order.status === 'Failed' ? 'status-failed' :
+                  'status-queued'
                 }`}>
                   {order.status}
                 </span>

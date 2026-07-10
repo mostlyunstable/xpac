@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNotification } from '../contexts/NotificationContext';
 import { getSettings, updateSettings } from '../services/api';
 import { generateUniqueId } from '../utils';
+import { SkeletonCard } from '../components/Skeleton';
 
 export default function Settings() {
   const { success, error } = useNotification();
@@ -82,20 +83,24 @@ export default function Settings() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[40vh]">
-        <div className="w-12 h-12 border-4 border-outline-variant border-t-primary rounded-full animate-spin" />
+      <div className="max-w-[800px] mx-auto space-y-xl">
+        <div>
+          <div className="h-8 w-48 bg-surface-container-highest rounded-lg animate-pulse" />
+          <div className="h-4 w-72 bg-surface-container-highest rounded-lg animate-pulse mt-2" />
+        </div>
+        {Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)}
       </div>
     );
   }
 
   return (
     <div className="max-w-[800px] mx-auto space-y-xl">
-      <div>
+      <div className="animate-fade-in">
         <h1 className="font-headline-lg text-headline-lg text-on-surface">Settings</h1>
         <p className="font-body-md text-body-md text-on-surface-variant mt-1">Manage your account and application preferences.</p>
       </div>
 
-      <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg">
+      <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg animate-stagger animate-stagger-1">
         <h2 className="font-title-lg text-title-lg text-on-surface mb-lg">Profile</h2>
         <div className="space-y-md">
           <div>
@@ -148,7 +153,7 @@ export default function Settings() {
         </button>
       </div>
 
-      <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg">
+      <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg animate-stagger animate-stagger-2">
         <h2 className="font-title-lg text-title-lg text-on-surface mb-lg">Preferences</h2>
         <div className="space-y-md">
           {[
@@ -178,7 +183,7 @@ export default function Settings() {
                 aria-checked={preferences[pref.key]}
               >
                 <span
-                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200 ease-out ${
                     preferences[pref.key] ? 'translate-x-6' : ''
                   }`}
                 />
@@ -196,7 +201,7 @@ export default function Settings() {
         </button>
       </div>
 
-      <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg">
+      <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg animate-stagger animate-stagger-3">
         <h2 className="font-title-lg text-title-lg text-on-surface mb-lg">API Key</h2>
         <p className="font-body-md text-body-md text-on-surface-variant mb-md">
           Use this key to authenticate API requests. Keep it secret.

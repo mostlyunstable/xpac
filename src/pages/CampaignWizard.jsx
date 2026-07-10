@@ -60,7 +60,9 @@ export default function CampaignWizard() {
 
       <div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
         <div className="p-lg md:p-xl">
-          <StepComponent />
+          <div key={safeStep} className="animate-fade-in">
+            <StepComponent />
+          </div>
         </div>
 
         {!isLastStep && (

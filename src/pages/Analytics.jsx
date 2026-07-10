@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getCampaigns, getOrders } from '../services/api';
+import { SkeletonCard } from '../components/Skeleton';
 
 export default function Analytics() {
   const [campaigns, setCampaigns] = useState([]);
@@ -42,15 +43,33 @@ export default function Analytics() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[40vh]">
-        <div className="w-12 h-12 border-4 border-outline-variant border-t-primary rounded-full animate-spin" />
+      <div className="space-y-xl">
+        <div>
+          <div className="h-8 w-48 bg-surface-container-highest rounded-lg animate-pulse" />
+          <div className="h-4 w-64 bg-surface-container-highest rounded-lg animate-pulse mt-2" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-lg">
+          {Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)}
+        </div>
+        <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg">
+          <div className="h-6 w-48 bg-surface-container-highest rounded-lg animate-pulse mb-lg" />
+          <div className="flex items-end gap-3 h-48">
+            {Array.from({ length: 7 }).map((_, i) => (
+              <div key={i} className="flex-1 flex flex-col items-center gap-2">
+                <div className="h-4 w-8 bg-surface-container-highest rounded animate-pulse" />
+                <div className="w-full bg-surface-container-highest rounded-t-lg animate-pulse" style={{ height: `${20 + Math.random() * 60}%` }} />
+                <div className="h-3 w-8 bg-surface-container-highest rounded animate-pulse" />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-xl">
-      <div>
+      <div className="animate-fade-in">
         <h1 className="font-headline-lg text-headline-lg text-on-surface">Analytics</h1>
         <p className="font-body-md text-body-md text-on-surface-variant mt-1">Detailed metrics and performance analytics.</p>
       </div>
@@ -61,8 +80,8 @@ export default function Analytics() {
           { label: 'Total Spend', value: `$${totalCost.toFixed(2)}`, icon: 'payments', color: 'text-secondary' },
           { label: 'Avg Cost/Campaign', value: `$${avgCost}`, icon: 'receipt_long', color: 'text-tertiary' },
           { label: 'Success Rate', value: orders.length > 0 ? `${((orders.filter(o => o.status === 'Completed').length / orders.length) * 100).toFixed(0)}%` : '0%', icon: 'percent', color: 'text-primary' },
-        ].map((metric) => (
-          <div key={metric.label} className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg">
+        ].map((metric, index) => (
+          <div key={metric.label} className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg animate-stagger" style={{ animationDelay: `${index * 60}ms` }}>
             <span className={`material-symbols-outlined ${metric.color} mb-2 block`}>{metric.icon}</span>
             <p className="font-display text-display text-on-surface">{metric.value}</p>
             <p className="font-label-md text-label-md text-on-surface-variant mt-1">{metric.label}</p>
@@ -73,8 +92,8 @@ export default function Analytics() {
       <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg">
         <h2 className="font-title-lg text-title-lg text-on-surface mb-lg">Weekly Campaign Activity</h2>
         <div className="flex items-end gap-3 h-48">
-          {dailyData.map((d) => (
-            <div key={d.label} className="flex-1 flex flex-col items-center gap-2">
+          {dailyData.map((d, index) => (
+            <div key={d.label} className="flex-1 flex flex-col items-center gap-2 animate-stagger" style={{ animationDelay: `${index * 60}ms` }}>
               <span className="font-label-md text-label-md text-on-surface-variant">{d.count}</span>
               <div
                 className="w-full bg-primary rounded-t-lg transition-all duration-500"

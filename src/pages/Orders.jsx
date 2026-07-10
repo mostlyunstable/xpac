@@ -49,14 +49,14 @@ export default function Orders() {
 
   return (
     <div className="space-y-lg">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between animate-fade-in">
         <div>
           <h1 className="font-headline-lg text-headline-lg text-on-surface">Orders</h1>
           <p className="font-body-md text-body-md text-on-surface-variant mt-1">{total} total orders</p>
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-md">
+      <div className="flex flex-col md:flex-row gap-md animate-stagger animate-stagger-1">
         <div className="relative flex-1">
           <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline">search</span>
           <input
@@ -111,20 +111,20 @@ export default function Orders() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-outline-variant">
-                  {orders.map((order) => (
-                    <tr key={order.id} className="hover:bg-surface-container-low transition-colors">
+                  {orders.map((order, index) => (
+                    <tr key={order.id} className="hover:bg-surface-container-low transition-colors animate-stagger" style={{ animationDelay: `${index * 40}ms` }}>
                       <td className="px-lg py-4">
                         <span className="font-body-md text-body-md font-semibold text-primary">{order.id}</span>
                       </td>
                       <td className="px-lg py-4 font-body-md text-body-md text-on-surface">{order.campaignName || '—'}</td>
                       <td className="px-lg py-4 font-body-md text-body-md text-on-surface">{order.contactCount || 0}</td>
                       <td className="px-lg py-4">
-                        <span className={`px-3 py-1 rounded-full font-label-md text-label-md ${
-                          order.status === 'Completed' ? 'bg-green-100 text-green-700' :
-                          order.status === 'Running' ? 'bg-blue-100 text-blue-700' :
-                          order.status === 'Processing' ? 'bg-yellow-100 text-yellow-700' :
-                          order.status === 'Failed' ? 'bg-red-100 text-red-700' :
-                          'bg-surface-container-highest text-on-surface-variant'
+                        <span className={`status-badge ${
+                          order.status === 'Completed' ? 'status-completed' :
+                          order.status === 'Running' ? 'status-running' :
+                          order.status === 'Processing' ? 'status-processing' :
+                          order.status === 'Failed' ? 'status-failed' :
+                          'status-queued'
                         }`}>
                           {order.status}
                         </span>

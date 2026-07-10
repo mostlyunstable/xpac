@@ -74,7 +74,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-xl">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between animate-fade-in">
         <div>
           <h1 className="font-headline-lg text-headline-lg text-on-surface">Dashboard</h1>
           <p className="font-body-md text-body-md text-on-surface-variant mt-1">Welcome back, Admin. Here's your overview.</p>
@@ -95,14 +95,14 @@ export default function Dashboard() {
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-lg">
-            <StatCard icon="campaign" label="Total Campaigns" value={totalCampaigns} color="primary" />
-            <StatCard icon="shopping_cart" label="Total Orders" value={totalOrders} color="secondary" />
-            <StatCard icon="play_arrow" label="Active Campaigns" value={activeCampaigns} color="tertiary" />
-            <StatCard icon="check_circle" label="Completed" value={campaigns.filter(c => c.status === 'Completed').length} color="primary" />
+            <div className="animate-stagger animate-stagger-1"><StatCard icon="campaign" label="Total Campaigns" value={totalCampaigns} color="primary" /></div>
+            <div className="animate-stagger animate-stagger-2"><StatCard icon="shopping_cart" label="Total Orders" value={totalOrders} color="secondary" /></div>
+            <div className="animate-stagger animate-stagger-3"><StatCard icon="play_arrow" label="Active Campaigns" value={activeCampaigns} color="tertiary" /></div>
+            <div className="animate-stagger animate-stagger-4"><StatCard icon="check_circle" label="Completed" value={campaigns.filter(c => c.status === 'Completed').length} color="primary" /></div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-lg">
-            <div className="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden">
+            <div className="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden animate-stagger animate-stagger-2">
               <div className="px-lg py-md border-b border-outline-variant flex items-center justify-between">
                 <h2 className="font-title-lg text-title-lg text-on-surface">Recent Campaigns</h2>
                 <Link to="/campaigns" className="font-label-md text-label-md text-primary hover:text-on-primary-fixed transition-colors">
@@ -125,11 +125,11 @@ export default function Dashboard() {
                         <p className="font-body-md text-body-md font-semibold text-on-surface">{c.campaignName || c.id}</p>
                         <p className="font-label-md text-label-md text-outline">{formatDate(c.createdAt)}</p>
                       </div>
-                      <span className={`px-3 py-1 rounded-full font-label-md text-label-md ${
-                        c.status === 'Completed' ? 'bg-green-100 text-green-700' :
-                        c.status === 'Running' ? 'bg-blue-100 text-blue-700' :
-                        c.status === 'Processing' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-surface-container-highest text-on-surface-variant'
+                      <span className={`status-badge ${
+                        c.status === 'Completed' ? 'status-completed' :
+                        c.status === 'Running' ? 'status-running' :
+                        c.status === 'Processing' ? 'status-processing' :
+                        'status-queued'
                       }`}>
                         {c.status}
                       </span>
@@ -139,7 +139,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden">
+            <div className="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden animate-stagger animate-stagger-3">
               <div className="px-lg py-md border-b border-outline-variant flex items-center justify-between">
                 <h2 className="font-title-lg text-title-lg text-on-surface">Recent Orders</h2>
                 <Link to="/orders" className="font-label-md text-label-md text-primary hover:text-on-primary-fixed transition-colors">
@@ -178,7 +178,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg">
+          <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg animate-stagger animate-stagger-4">
             <h2 className="font-title-lg text-title-lg text-on-surface mb-lg">Quick Actions</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-md">
               {[
@@ -186,11 +186,12 @@ export default function Dashboard() {
                 { icon: 'upload_file', label: 'Upload Contacts', to: '/campaigns' },
                 { icon: 'assessment', label: 'View Reports', to: '/reports' },
                 { icon: 'settings', label: 'Settings', to: '/settings' },
-              ].map((action) => (
+              ].map((action, index) => (
                 <Link
                   key={action.label}
                   to={action.to}
-                  className="flex flex-col items-center gap-3 p-4 rounded-xl border border-outline-variant hover:bg-surface-container-low hover:border-primary transition-all duration-200 group"
+                  className="flex flex-col items-center gap-3 p-4 rounded-xl border border-outline-variant hover:bg-surface-container-low hover:border-primary transition-all duration-200 group animate-stagger"
+                  style={{ animationDelay: `${index * 60}ms` }}
                 >
                   <div className="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
                     <span className="material-symbols-outlined">{action.icon}</span>
