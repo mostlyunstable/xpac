@@ -1,30 +1,11 @@
 import { Router } from 'express';
 import multer from 'multer';
-import { v4 as uuidv4 } from 'uuid';
-import { join, extname, dirname } from 'path';
-import { fileURLToPath } from 'url';
-import { existsSync, mkdirSync } from 'fs';
+import { extname } from 'path';
+import { uploadFile } from '../services/storage.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const uploadsDir = join(__dirname, '..', 'uploads');
-
-if (!existsSync(uploadsDir)) {
-  mkdirSync(uploadsDir, { recursive: true });
-}
-
-const ALLOWED_EXTENSIONS = ['.csv', '.xlsx', '.xls', '.pdf', '.txt'];
+const ALLOWED_EXTENSIONS = ['.csv', '.xlsx', '.xls', '.pdf', '.txt', '.mp3', '.wav'];
 const BLOCKED_EXTENSIONS = ['.exe', '.sh', '.bat', '.cmd', '.com', '.msi', '.scr', '.pif', '.js', '.vbs', '.wsf'];
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadsDir),
-  filename: (req, file, cb) => {
-    const id = uuidv4();
-    const ext = extname(file.originalname).toLowerCase();
-    cb(null, `${id}${ext}`);
-  },
-});
+const MAX_AUDIO_SIZE = 25 * 1024 * 1024;
 
 const fileFilter = (req, file, cb) => {
   const ext = extname(file.originalname).toLowerCase();
@@ -38,35 +19,41 @@ const fileFilter = (req, file, cb) => {
 };
 
 const upload = multer({
-  storage,
   fileFilter,
-  limits: { fileSize: MAX_FILE_SIZE },
+  limits: { fileSize: MAX_AUDIO_SIZE },
 });
 
 const router = Router();
 
-router.post('/', upload.single('file'), (req, res) => {
+router.post('/', upload.single('file'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file provided' });
   }
   if (req.file.size === 0) {
     return res.status(400).json({ error: 'Empty files are not allowed' });
   }
-  res.json({
-    id: req.file.filename.split('.')[0],
-    filename: req.file.originalname,
-    storedFilename: req.file.filename,
-    size: req.file.size,
-    type: req.file.mimetype,
-    uploadedAt: new Date().toISOString(),
-    path: `/uploads/${req.file.filename}`,
-  });
+  
+  try {
+    const result = await uploadFile(req.file);
+    res.json({
+      id: result.key.split('.')[0],
+      filename: req.file.originalname,
+      storedFilename: result.key,
+      size: req.file.size,
+      type: req.file.mimetype,
+      uploadedAt: new Date().toISOString(),
+      path: result.url,
+    });
+  } catch (err) {
+    console.error('Upload error:', err);
+    res.status(500).json({ error: 'Failed to upload file' });
+  }
 });
 
 router.use((err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     if (err.code === 'LIMIT_FILE_SIZE') {
-      return res.status(413).json({ error: 'File too large. Maximum size is 10MB.' });
+      return res.status(413).json({ error: 'File too large. Maximum size is 10MB (25MB for audio).' });
     }
     return res.status(400).json({ error: err.message });
   }

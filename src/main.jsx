@@ -6,6 +6,7 @@ import ErrorBoundary from './components/ErrorBoundary'
 import { WizardProvider } from './contexts/WizardContext'
 import { NotificationProvider } from './contexts/NotificationContext'
 import { AIProvider } from './contexts/AIContext'
+import { AuthProvider } from './contexts/AuthContext'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -14,9 +15,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <BrowserRouter>
         <NotificationProvider>
           <WizardProvider>
-            <AIProvider>
-              <App />
-            </AIProvider>
+            <AuthProvider>
+              <AIProvider>
+                <App />
+              </AIProvider>
+            </AuthProvider>
           </WizardProvider>
         </NotificationProvider>
       </BrowserRouter>

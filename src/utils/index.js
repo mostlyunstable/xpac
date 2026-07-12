@@ -134,3 +134,59 @@ export function calculateEstimatedDuration(contactCount) {
   const remaining = minutes % 60;
   return remaining > 0 ? `${hours}h ${remaining}m` : `${hours}h`;
 }
+
+export const REQUIRED_CONTACT_FIELDS = ['phone'];
+export const OPTIONAL_CONTACT_FIELDS = ['name', 'email', 'company', 'city', 'country'];
+
+export function getContactCSVTemplate() {
+  const headers = ['phone', 'name', 'email', 'company', 'city', 'country'];
+  const sampleRows = [
+    '+15551234567,John Doe,john@example.com,Acme Corp,New York,USA',
+    '+15559876543,Jane Smith,jane@techstart.io,TechStart Inc,San Francisco,USA',
+    '+442071234567,Bob Wilson,bob@smallbiz.co.uk,SmallBiz Ltd,London,UK'
+  ];
+  return [headers.join(','), ...sampleRows].join('\n');
+}
+
+export function validateContactCSV(text) {
+  const { headers, rows } = parseCSV(text);
+  
+  const missingRequired = REQUIRED_CONTACT_FIELDS.filter(field => 
+    !headers.some(h => h.toLowerCase().includes(field))
+  );
+  
+  if (missingRequired.length > 0) {
+    return { 
+      valid: false, 
+      error: `Missing required columns: ${missingRequired.join(', ')}. Required: ${REQUIRED_CONTACT_FIELDS.join(', ')}` 
+    };
+  }
+  
+  const phoneCol = headers.find(h => h.toLowerCase().includes('phone'));
+  const invalidPhones = rows
+    .map((row, i) => ({ row: i + 2, phone: row[phoneCol] }))
+    .filter(r => r.phone && !validatePhone(r.phone))
+    .map(r => `Row ${r.row}: "${r.phone}"`);
+  
+  if (invalidPhones.length > 0) {
+    return { 
+      valid: false, 
+      error: `Invalid phone numbers found:\n${invalidPhones.slice(0, 5).join('\n')}${invalidPhones.length > 5 ? '\n...' : ''}` 
+    };
+  }
+  
+  const emailCol = headers.find(h => h.toLowerCase().includes('email'));
+  const invalidEmails = rows
+    .map((row, i) => ({ row: i + 2, email: row[emailCol] }))
+    .filter(r => r.email && r.email.trim() && !validateEmail(r.email))
+    .map(r => `Row ${r.row}: "${r.email}"`);
+  
+  if (invalidEmails.length > 0) {
+    return { 
+      valid: false, 
+      error: `Invalid email addresses found:\n${invalidEmails.slice(0, 5).join('\n')}${invalidEmails.length > 5 ? '\n...' : ''}` 
+    };
+  }
+  
+  return { valid: true, contactCount: rows.length };
+}

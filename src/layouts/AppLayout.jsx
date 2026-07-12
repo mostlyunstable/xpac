@@ -1,28 +1,45 @@
 import { useState, useEffect, useRef } from 'react';
-import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { NAV_ITEMS } from '../constants';
+import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { NAV_ITEMS, ADMIN_NAV_ITEMS } from '../constants';
 import { classNames } from '../utils';
 import { useNotification } from '../contexts/NotificationContext';
+import { useAuth } from '../contexts/AuthContext';
 import FloatingAI from '../components/FloatingAI';
 import NotificationToast from '../components/NotificationToast';
 
 export default function AppLayout() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const { notifications, removeNotification } = useNotification();
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const notifRef = useRef(null);
+  const userMenuRef = useRef(null);
+  const isAdmin = location.pathname.startsWith('/admin');
+
+  const navItems = isAdmin ? ADMIN_NAV_ITEMS : NAV_ITEMS;
 
   useEffect(() => {
     function handleClickOutside(e) {
       if (notifRef.current && !notifRef.current.contains(e.target)) {
         setShowNotifDropdown(false);
       }
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setShowUserMenu(false);
+      }
     }
-    if (showNotifDropdown) {
+    if (showNotifDropdown || showUserMenu) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
-  }, [showNotifDropdown]);
+  }, [showNotifDropdown, showUserMenu]);
+
+  const handleLogout = async () => {
+    await logout();
+    setShowUserMenu(false);
+    navigate('/login');
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -87,8 +104,34 @@ export default function AppLayout() {
               </div>
             </div>
           )}
-          <div className="h-8 w-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold text-sm">
-            EA
+          <div className="flex items-center gap-3" ref={userMenuRef}>
+            <div className="h-8 w-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold text-sm">
+              {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+            </div>
+            <button
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-surface-container-low transition-colors"
+              aria-label="User menu"
+            >
+              <span className="font-body-md text-body-md text-on-surface truncate max-w-[150px]">{user?.name || 'User'}</span>
+              <span className="material-symbols-outlined text-on-surface-variant">expand_more</span>
+            </button>
+            {showUserMenu && (
+              <div className="absolute top-full right-0 mt-2 w-48 bg-surface-container-lowest rounded-xl border border-outline-variant shadow-xl z-[100] overflow-hidden animate-pop-in">
+                <div className="px-4 py-3 border-b border-outline-variant">
+                  <p className="font-body-md text-body-md text-on-surface truncate">{user?.name || 'User'}</p>
+                  <p className="font-label-md text-label-md text-outline truncate">{user?.email || ''}</p>
+                  <p className="font-label-md text-label-md text-primary capitalize">{user?.role || 'customer'}</p>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 px-4 py-2 font-body-md text-body-md text-on-surface hover:bg-surface-container-low transition-colors"
+                >
+                  <span className="material-symbols-outlined">logout</span>
+                  Sign Out
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -100,15 +143,16 @@ export default function AppLayout() {
               <span className="material-symbols-outlined text-white" style={{ fontVariationSettings: "'FILL' 1" }}>person</span>
             </div>
             <div>
-              <p className="font-title-lg text-title-lg text-primary leading-tight">Admin</p>
-              <p className="font-label-md text-label-md text-outline">v1.0.0</p>
+              <p className="font-title-lg text-title-lg text-primary leading-tight">{user?.name || 'User'}</p>
+              <p className="font-label-md text-label-md text-outline">{user?.role === 'admin' ? 'Administrator' : 'Customer'}</p>
             </div>
           </div>
         </div>
         <nav className="flex-1 px-sm">
-          {NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             const isActive = location.pathname === item.path || 
-              (item.path === '/campaigns' && location.pathname.startsWith('/campaign'));
+              (item.path === '/campaigns' && location.pathname.startsWith('/campaign')) ||
+              (item.path === '/admin/campaigns' && location.pathname.startsWith('/admin/campaigns'));
             return (
               <NavLink
                 key={item.path}

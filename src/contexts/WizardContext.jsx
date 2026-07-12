@@ -1,5 +1,4 @@
 import { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
-import { WIZARD_STEPS } from '../constants';
 
 const WizardContext = createContext(null);
 
@@ -7,12 +6,12 @@ const STORAGE_KEY = 'xpac_wizard_state';
 
 const DEFAULT_STATE = {
   currentStep: 1,
-  uploadedFile: null,
-  mapping: { name: null, phone: null, email: null, company: null, city: null, country: null },
-  csvData: null,
-  aiConfig: { voice: 'alloy', language: 'en', customPrompt: '', scriptType: 'standard' },
+  broadcastName: '',
+  audioFile: null,
+  contactFile: null,
+  contactData: null,
+  description: '',
   scheduleConfig: { mode: 'immediate', date: '', time: '', timezone: 'UTC' },
-  launchConfig: { campaignName: '', campaignDescription: '' },
 };
 
 function loadState() {
@@ -23,10 +22,7 @@ function loadState() {
       return {
         ...DEFAULT_STATE,
         ...parsed,
-        mapping: { ...DEFAULT_STATE.mapping, ...(parsed.mapping || {}) },
-        aiConfig: { ...DEFAULT_STATE.aiConfig, ...(parsed.aiConfig || {}) },
         scheduleConfig: { ...DEFAULT_STATE.scheduleConfig, ...(parsed.scheduleConfig || {}) },
-        launchConfig: { ...DEFAULT_STATE.launchConfig, ...(parsed.launchConfig || {}) },
       };
     }
   } catch { /* ignore */ }
@@ -39,42 +35,26 @@ function saveState(state) {
   } catch { /* ignore */ }
 }
 
-const initialState = loadState() || {
-  currentStep: 1,
-  uploadedFile: null,
-  mapping: { name: null, phone: null, email: null, company: null, city: null, country: null },
-  csvData: null,
-  aiConfig: { voice: 'alloy', language: 'en', customPrompt: '', scriptType: 'standard' },
-  scheduleConfig: { mode: 'immediate', date: '', time: '', timezone: 'UTC' },
-  launchConfig: { campaignName: '', campaignDescription: '' },
-};
+const initialState = loadState() || { ...DEFAULT_STATE };
 
 function wizardReducer(state, action) {
   switch (action.type) {
     case 'SET_STEP':
       return { ...state, currentStep: action.payload };
-    case 'SET_UPLOADED_FILE':
-      return { ...state, uploadedFile: action.payload };
-    case 'SET_CSV_DATA':
-      return { ...state, csvData: action.payload };
-    case 'SET_MAPPING':
-      return { ...state, mapping: { ...state.mapping, ...action.payload } };
-    case 'SET_AI_CONFIG':
-      return { ...state, aiConfig: { ...state.aiConfig, ...action.payload } };
+    case 'SET_BROADCAST_NAME':
+      return { ...state, broadcastName: action.payload };
+    case 'SET_AUDIO_FILE':
+      return { ...state, audioFile: action.payload };
+    case 'SET_CONTACT_FILE':
+      return { ...state, contactFile: action.payload };
+    case 'SET_CONTACT_DATA':
+      return { ...state, contactData: action.payload };
+    case 'SET_DESCRIPTION':
+      return { ...state, description: action.payload };
     case 'SET_SCHEDULE_CONFIG':
       return { ...state, scheduleConfig: { ...state.scheduleConfig, ...action.payload } };
-    case 'SET_LAUNCH_CONFIG':
-      return { ...state, launchConfig: { ...state.launchConfig, ...action.payload } };
     case 'RESET':
-      return {
-        currentStep: 1,
-        uploadedFile: null,
-        mapping: { name: null, phone: null, email: null, company: null, city: null, country: null },
-        csvData: null,
-        aiConfig: { voice: 'alloy', language: 'en', customPrompt: '', scriptType: 'standard' },
-        scheduleConfig: { mode: 'immediate', date: '', time: '', timezone: 'UTC' },
-        launchConfig: { campaignName: '', campaignDescription: '' },
-      };
+      return { ...DEFAULT_STATE };
     default:
       return state;
   }
@@ -87,24 +67,22 @@ export function WizardProvider({ children }) {
     saveState(state);
   }, [state]);
 
-  const totalSteps = WIZARD_STEPS.length;
+  const totalSteps = 5;
 
   const canGoNext = useCallback(() => {
     const s = state;
     switch (s.currentStep) {
       case 1:
-        return !!s.uploadedFile;
+        return !!s.broadcastName.trim();
       case 2:
-        return !!s.mapping.phone;
+        return !!s.audioFile;
       case 3:
-        return !!s.aiConfig.voice && !!s.aiConfig.language;
+        return !!s.contactFile;
       case 4:
-        if (s.scheduleConfig.mode === 'immediate') return true;
-        if (!s.scheduleConfig.date || !s.scheduleConfig.time) return false;
-        const selected = new Date(`${s.scheduleConfig.date}T${s.scheduleConfig.time}`);
-        return selected > new Date();
+        return true; // Description is optional
       case 5:
-        return !!s.launchConfig.campaignName.trim();
+        if (s.scheduleConfig.mode === 'immediate') return true;
+        return !!s.scheduleConfig.date && !!s.scheduleConfig.time;
       default:
         return false;
     }
@@ -141,12 +119,12 @@ export function WizardProvider({ children }) {
     goPrev,
     goTo,
     reset,
-    setUploadedFile: (file) => dispatch({ type: 'SET_UPLOADED_FILE', payload: file }),
-    setCsvData: (data) => dispatch({ type: 'SET_CSV_DATA', payload: data }),
-    setMapping: (mapping) => dispatch({ type: 'SET_MAPPING', payload: mapping }),
-    setAiConfig: (config) => dispatch({ type: 'SET_AI_CONFIG', payload: config }),
+    setBroadcastName: (name) => dispatch({ type: 'SET_BROADCAST_NAME', payload: name }),
+    setAudioFile: (file) => dispatch({ type: 'SET_AUDIO_FILE', payload: file }),
+    setContactFile: (file) => dispatch({ type: 'SET_CONTACT_FILE', payload: file }),
+    setContactData: (data) => dispatch({ type: 'SET_CONTACT_DATA', payload: data }),
+    setDescription: (desc) => dispatch({ type: 'SET_DESCRIPTION', payload: desc }),
     setScheduleConfig: (config) => dispatch({ type: 'SET_SCHEDULE_CONFIG', payload: config }),
-    setLaunchConfig: (config) => dispatch({ type: 'SET_LAUNCH_CONFIG', payload: config }),
   };
 
   return (
